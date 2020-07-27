@@ -1,10 +1,8 @@
 # guacamole-auth-hmac
 
-Built for **Guacamole 0.9.13-incubating**.
 
 ## Description
-
-This project is a plugin for [Guacamole](http://guac-dev.org), an HTML5 based
+This project is a plugin for [Guacamole](https://guacamole.apache.org/), an HTML5 based
 remote desktop solution supporting VNC/RFB, RDP, and SSH.
 
 This plugin is an _authentication provider_ that enables stateless, on-the-fly
@@ -12,33 +10,30 @@ configuration of remote desktop connections that are authorized using a
 pre-shared key. It is most appropriate for scenarios where you have an existing
 user authentication & authorization mechanism.
 
-## Building
 
+## Building
 guacamole-auth-hmac uses Maven for managing builds. After installing Maven you can build a
 suitable jar for deployment with `mvn package`.
 
 The resulting jar file will be placed in `target/guacamole-auth-hmac-<version>.jar`.
 
+
 ## Deployment & Configuration
-
-**Warning** This plugin relies on API's introduced in Guacamole 0.8.3, so you must be running
-at least that version before using this plugin.
-
-Copy `guacamole-auth-hmac.jar` to the location specified by [`lib-directory`][config-classpath] in `guacamole.properties`.
+Copy `guacamole-auth-hmac.jar` to `$GUACAMOLE_HOME/extensions/`
 
 ### Docker Configuration
-Mount a directory containing `guacamole-auth-hmac-0.9.13-incubating.jar` to the extensions directory one directory under the directory that is defined as GUACAMOLE_HOME. An example docker-compose.yml is provided below:
+Mount a directory containing the compiled JAR to the extensions directory one directory under the directory that is defined as `GUACAMOLE_HOME`. An example `docker-compose.yml` is provided below:
 
 ```
 version: '3'
 services:
   guacd:
-        image: guacamole/guacd:0.9.13-incubating
+        image: guacamole/guacd:1.0.0
         hostname: guacd
         restart: always
 
     guacamole:
-        image: guacamole/guacamole:0.9.13-incubating
+        image: guacamole/guacamole:1.0.0
         hostname: guacamole
         restart: always
         links:
@@ -56,22 +51,22 @@ services:
 ```
 The structure of guacamole-data looks like:
 ```
-guacamole-data
-└── config
-    ├── extensions
-    │   └── guacamole-auth-hmac-0.9.13-incubating.jar
-    ├── guacamole.properties
-    └── lib
+guacamole-data/
+└── config/
+    ├── extensions/
+    │   └── guacamole-auth-hmac.jar
+    ├── keys/
+    └── guacamole.properties
 ```
 And guacamole.properties contains:
 ```
 secret-key: <some-secret-key>
 timestamp-age-limit: 100000
-auth-provider: com.stephensugden.guacamole.net.hmac.HmacAuthenticationProvider
+use-local-privkey: True
+key-directory: /config/keys/
 ```
-With this configuration for Docker, a database is not required (requires 0.9.13).
 
-**NOTE** Be sure to `chmod 755` the extension jar or it will not be loaded! Also, the very first request for authentication fails with a 500 error, but all subsequent requests succeed.
+**NOTE** Be sure to `chmod 755` the extension jar or it will not be loaded!
 
 ### guacamole.properties
 This extension adds extra config keys to `guacamole.properties`:
@@ -83,8 +78,6 @@ This extension adds extra config keys to `guacamole.properties`:
 | `use-local-privkey`     | no       | False                 | A boolean value to specify whether or not Guacamole should check on the local filesystem for private keys.               |
 | `key-directory`         | no       | /etc/guacamole/keys   | A String specifying the location of local private keys. **No trailing '/'.**                                             |
 
-
-[config-classpath]: http://guac-dev.org/doc/gug/configuring-guacamole.html#idp380240
 
 ## Usage
 
