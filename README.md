@@ -18,8 +18,13 @@ suitable jar for deployment with `mvn package`.
 The resulting jar file will be placed in `target/guacamole-auth-hmac-<version>.jar`.
 
 
+## Updating
+In order to update this, simply edit `pom.xml` and change the version tag to match the latest Guacamole version that you intend to use.
+
+
 ## Deployment & Configuration
 Copy `guacamole-auth-hmac.jar` to `$GUACAMOLE_HOME/extensions/`
+
 
 ### Docker Configuration
 Mount a directory containing the compiled JAR to the extensions directory one directory under the directory that is defined as `GUACAMOLE_HOME`. An example `docker-compose.yml` is provided below:
@@ -68,6 +73,7 @@ key-directory: /config/keys/
 
 **NOTE** Be sure to `chmod 755` the extension jar or it will not be loaded!
 
+
 ### guacamole.properties
 This extension adds extra config keys to `guacamole.properties`:
 
@@ -80,7 +86,6 @@ This extension adds extra config keys to `guacamole.properties`:
 
 
 ## Usage
-
 | Variable                | Required | Default | Comments                                                                                                                     |
 |-------------------------|----------|---------|------------------------------------------------------------------------------------------------------------------------------|
 | `id`                    | yes      | None    | A connection ID that must be unique per user session. Can be a random integer or UUID.                                       |
@@ -97,12 +102,13 @@ This extension adds extra config keys to `guacamole.properties`:
 #### Private keys
 Since users are authenticated using a web request to the Guacamole server, it is insecure to use pubkey auth by sending the private keys over the web. This feature is enabled by the config parameter `use-local-privkey`. If true, Guacamole will look for the private key `$GUACAMOLE_HOME/keys/<username>/id_rsa_guac` and enable SFTP and use the key for SSH auth. The key and directory must be owned by the user running Guacamole (`tomcat7` in my case).
 
-## Request Signing
 
+## Request Signing
 Requests must be signed with an HMAC, where the message content is generated from the request parameters as follows:
 
  1. The parameters `timestamp`, `guac.protocol`, `hostname`, and `port` are concatenated. If `username` and `password` parameters are supplied, they are also concatenated.
  2. Encrypt using SHA256.
+
 
 ## POST
 Using the python example, parameters can be POSTed to `/guacamole/api/tokens` to authenticate. The response is then sent as JSON and contains `authToken` which is then used to login: `guacamole/#/client/(connection)?token=(authToken)`
